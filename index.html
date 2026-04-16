@@ -3,41 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>上慶配件接單系統 (測試版)</title>
+    <title>上慶配件接單系統 (多語測試版)</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        [v-cloak] { display: none; }
+        .active-lang { border: 2px solid #2563eb; color: #2563eb; font-weight: bold; }
+    </style>
 </head>
 <body class="bg-gray-100">
-    <div id="app" class="max-w-md mx-auto bg-white min-h-screen shadow-lg pb-24">
-        <div class="bg-blue-600 text-white p-4 sticky top-0 z-10">
-            <h1 class="text-xl font-bold text-center">上慶配件自動接單</h1>
+    <div id="app" v-cloak class="max-w-md mx-auto bg-white min-h-screen shadow-lg pb-32">
+        
+        <div class="bg-white p-3 flex justify-end gap-2 sticky top-0 z-20 shadow-sm">
+            <button @click="lang = 'zh'" :class="{'active-lang': lang === 'zh'}" class="px-3 py-1 text-xs border rounded-full">繁中</button>
+            <button @click="lang = 'en'" :class="{'active-lang': lang === 'en'}" class="px-3 py-1 text-xs border rounded-full">EN</button>
+            <button @click="lang = 'vi'" :class="{'active-lang': lang === 'vi'}" class="px-3 py-1 text-xs border rounded-full">Tiếng Việt</button>
+        </div>
+
+        <div class="bg-blue-600 text-white p-6">
+            <h1 class="text-2xl font-bold">{{ t.title }}</h1>
+            <p class="text-blue-100 text-sm mt-1">{{ t.subtitle }}</p>
         </div>
 
         <div class="p-4 space-y-4">
-            <div v-for="item in products" :key="item.id" class="flex items-center p-3 border rounded-lg bg-white shadow-sm">
-                <div class="w-20 h-20 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center text-gray-400 text-xs text-center">
-                    照片<br>位置
+            <div v-for="item in products" :key="item.id" class="flex items-center p-3 border rounded-xl bg-white shadow-sm hover:border-blue-300 transition">
+                <div class="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center text-gray-400 text-[10px] text-center">
+                    PHOTO
                 </div>
                 <div class="ml-4 flex-1">
-                    <h3 class="font-bold text-gray-800">{{ item.name }}</h3>
-                    <p class="text-sm text-gray-500">{{ item.spec }}</p>
-                    <p class="text-blue-600 font-bold mt-1">${{ item.price }}</p>
+                    <h3 class="font-bold text-gray-800 leading-tight">{{ item.name[lang] }}</h3>
+                    <p class="text-[11px] text-gray-500 mt-1">{{ item.spec[lang] }}</p>
+                    <p class="text-blue-600 font-bold mt-1 text-lg">${{ item.price }}</p>
                 </div>
                 <div class="flex items-center space-x-2">
-                    <button @click="dec(item)" class="w-8 h-8 bg-gray-100 rounded-full font-bold text-lg">-</button>
+                    <button @click="dec(item)" class="w-8 h-8 bg-gray-100 rounded-lg font-bold text-lg flex items-center justify-center">-</button>
                     <span class="w-6 text-center font-bold">{{ item.qty }}</span>
-                    <button @click="inc(item)" class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold text-lg">+</button>
+                    <button @click="inc(item)" class="w-8 h-8 bg-blue-600 text-white rounded-lg font-bold text-lg flex items-center justify-center">+</button>
                 </div>
             </div>
         </div>
 
-        <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t p-4 shadow-2xl">
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-gray-600">已選品項: {{ totalCount }}</span>
-                <span class="text-xl font-bold text-red-600">總計: ${{ totalPrice }}</span>
+        <div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t p-4 shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
+            <div class="flex justify-between items-center mb-4 px-2">
+                <span class="text-gray-600 font-medium">{{ t.items }}: {{ totalCount }}</span>
+                <span class="text-2xl font-black text-red-600">{{ t.total }}: ${{ totalPrice }}</span>
             </div>
-            <button @click="submitOrder" class="w-full bg-green-600 text-white py-4 rounded-xl font-bold text-lg active:bg-green-700">
-                確認下單 (開啟 Line 傳送)
+            <button @click="submitOrder" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold text-xl active:scale-95 transition shadow-lg">
+                {{ t.submit }}
             </button>
         </div>
     </div>
@@ -47,40 +59,5 @@
         createApp({
             data() {
                 return {
-                    products: [
-                        { id: 1, name: '2" 鍍鋅管蓋', spec: '標準規格', price: 25, qty: 0 },
-                        { id: 2, name: '中型張力器', spec: '加厚型', price: 45, qty: 0 },
-                        { id: 3, name: '固定夾 (小)', spec: '1.5吋適用', price: 15, qty: 0 },
-                        { id: 4, name: '固定夾 (大)', spec: '2.0吋適用', price: 18, qty: 0 },
-                        { id: 5, name: '張力條', spec: '1.2米', price: 70, qty: 0 },
-                        { id: 6, name: 'U型螺栓', spec: '含螺母', price: 12, qty: 0 },
-                        { id: 7, name: '飾蓋', spec: '塑膠黑', price: 10, qty: 0 },
-                        { id: 8, name: '連接件', spec: '萬向型', price: 120, qty: 0 },
-                        { id: 9, name: '支撐架', spec: '烤漆', price: 250, qty: 0 },
-                        { id: 10, name: '配件包', spec: '綜合組', price: 500, qty: 0 }
-                    ]
-                }
-            },
-            computed: {
-                totalPrice() { return this.products.reduce((s, i) => s + (i.price * i.qty), 0) },
-                totalCount() { return this.products.reduce((s, i) => s + i.qty, 0) }
-            },
-            methods: {
-                inc(item) { item.qty++ },
-                dec(item) { if(item.qty > 0) item.qty-- },
-                submitOrder() {
-                    const selected = this.products.filter(i => i.qty > 0);
-                    if (selected.length === 0) return alert("請選擇配件！");
-                    
-                    let msg = "【上慶配件訂單】\n---\n";
-                    selected.forEach(i => msg += `${i.name} x ${i.qty}\n`);
-                    msg += `---\n總計：$${this.totalPrice}`;
-                    
-                    // 呼叫 Line 傳送訊息
-                    window.location.href = `https://line.me/R/msg/text/?${encodeURIComponent(msg)}`;
-                }
-            }
-        }).mount('#app')
-    </script>
-</body>
-</html>
+                    lang: 'zh',
+                    i18n: {
